@@ -13,6 +13,10 @@ public class Fields {
         return thumbnail;
     }
 
+    public Fields(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }

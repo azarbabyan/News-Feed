@@ -1,43 +1,67 @@
 package com.example.newsfeed.network.data;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
+
+import com.example.newsfeed.data.database.FieldConverter;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "results")
 public class Result {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
+    @NonNull
     @SerializedName("id")
     @Expose
     private String id;
+    @ColumnInfo(name = "type")
     @SerializedName("type")
     @Expose
     private String type;
+    @ColumnInfo(name = "sectionId")
     @SerializedName("sectionId")
     @Expose
     private String sectionId;
+    @ColumnInfo(name = "sectionName")
     @SerializedName("sectionName")
     @Expose
     private String sectionName;
+    @ColumnInfo(name = "webPublicationDate")
     @SerializedName("webPublicationDate")
     @Expose
     private String webPublicationDate;
+    @ColumnInfo(name = "webTitle")
     @SerializedName("webTitle")
     @Expose
     private String webTitle;
+    @ColumnInfo(name = "webUrl")
     @SerializedName("webUrl")
     @Expose
     private String webUrl;
+    @ColumnInfo(name = "apiUrl")
     @SerializedName("apiUrl")
     @Expose
     private String apiUrl;
+    @ColumnInfo(name = "fields")
     @SerializedName("fields")
+    @TypeConverters(FieldConverter.class)
     @Expose
     private Fields fields;
+    @ColumnInfo(name = "isHosted")
     @SerializedName("isHosted")
     @Expose
     private Boolean isHosted;
+    @ColumnInfo(name = "pillarId")
     @SerializedName("pillarId")
     @Expose
     private String pillarId;
+    @ColumnInfo(name = "pillarName")
     @SerializedName("pillarName")
     @Expose
     private String pillarName;
