@@ -1,6 +1,6 @@
 package com.example.newsfeed.network;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.example.newsfeed.utils.AppConstants;
 
