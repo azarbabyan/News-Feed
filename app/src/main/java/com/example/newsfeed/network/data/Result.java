@@ -2,6 +2,7 @@ package com.example.newsfeed.network.data;
 
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -10,6 +11,8 @@ import androidx.room.TypeConverters;
 import com.example.newsfeed.data.database.FieldConverter;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Objects;
 
 @Entity(tableName = "results")
 public class Result {
@@ -162,4 +165,57 @@ public class Result {
         this.pillarName = pillarName;
     }
 
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + this.id.hashCode();
+        hash = 53 * hash + this.sectionName.hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj==null){
+            return false;
+        }
+        if (!(obj instanceof Result)){
+            return false;
+        }
+        final Result result = (Result) obj;
+        if (!Objects.equals(this.id, result.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.type, result.type)) {
+            return false;
+        }
+        if (!Objects.equals(this.sectionId, result.sectionId)) {
+            return false;
+        }
+        if (!Objects.equals(this.sectionName, result.sectionName)) {
+            return false;
+        }
+        if (!Objects.equals(this.webPublicationDate, result.webPublicationDate)) {
+            return false;
+        }
+        if (!Objects.equals(this.webTitle, result.webTitle)) {
+            return false;
+        }
+        if (!Objects.equals(this.webUrl, result.webUrl)) {
+            return false;
+        }
+        if (!Objects.equals(this.apiUrl, result.apiUrl)) {
+            return false;
+        }
+        if (!Objects.equals(this.fields, result.fields)) {
+            return false;
+        }
+        if (!Objects.equals(this.isHosted, result.isHosted)) {
+            return false;
+        }
+        if (!Objects.equals(this.pillarName, result.pillarName)) {
+            return false;
+        }
+        return Objects.equals(this.pillarId, result.pillarId);
+    }
 }

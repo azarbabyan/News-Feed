@@ -1,6 +1,8 @@
 package com.example.newsfeed.ui.adapters;
 
 import androidx.annotation.NonNull;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +17,16 @@ import com.example.newsfeed.network.data.Result;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
+public class FeedAdapter extends PagedListAdapter<Result,FeedAdapter.ViewHolder> {
     private List<Result> data = new ArrayList<>();
+
+    public FeedAdapter() {
+        super(DIFF_CALLBACK);
+    }
 
     public void updateList(List<Result> results){
         data = results;
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     @NonNull
@@ -33,13 +39,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        viewHolder.bind(data.get(i));
+        Result result = getItem(i);
+        if (result != null) {
+            viewHolder.bind(result);
+        } else {
+            // Null defines a placeholder item - PagedListAdapter automatically
+            // invalidates this row when the actual object is loaded from the
+            // database.
+            viewHolder.clear();
+        }
     }
 
-    @Override
-    public int getItemCount() {
-        return data.size();
-    }
 
     class ViewHolder extends RecyclerView.ViewHolder{
         TextView title;
@@ -56,9 +66,30 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         void bind(Result result){
             title.setText(result.getWebTitle());
             category.setText(result.getSectionName());
-            Glide.with(thumb.getContext())
-                    .load(result.getFields().getThumbnail())
-                    .into(thumb);
+            if (result.getFields()!=null && result.getFields().getThumbnail()!=null) {
+                Glide.with(thumb.getContext())
+                        .load(result.getFields().getThumbnail())
+                        .into(thumb);
+            }else {
+                thumb.setImageResource(R.drawable.ic_launcher_background);
+            }
+        }
+        void clear(){
+            title.setText(null);
+            category.setText(null);
+            thumb.setImageDrawable(null);
         }
     }
+
+    private static DiffUtil.ItemCallback<Result> DIFF_CALLBACK = new DiffUtil.ItemCallback<Result>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Result oldItem, @NonNull Result newItem) {
+            return oldItem.getId().equals(newItem.getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Result oldItem, @NonNull Result newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
 }

@@ -40,7 +40,7 @@ public class NewsRepository {
     }
 
     public LiveData<List<Result>> getNews(Integer startPage){
-        NewsFeedApplication.getApiService().getNews(startPage).enqueue(new Callback<NewsResponse>() {
+        NewsFeedApplication.getApiService().getNews(startPage,100).enqueue(new Callback<NewsResponse>() {
             @Override
             public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
                 if (response.body() !=null){
@@ -66,5 +66,9 @@ public class NewsRepository {
             }
         });
         return newsDao.getAllNews();
+    }
+
+    public NewsDao getNewsDao() {
+        return newsDao;
     }
 }

@@ -8,5 +8,5 @@ import retrofit2.http.Query;
 
 public interface NewsApiService {
     @GET("search")
-    Call<NewsResponse> getNews(@Query("page") Integer startPage);
+    Call<NewsResponse> getNews(@Query("page") Integer startPage,@Query("page-size") Integer pageSize);
 }

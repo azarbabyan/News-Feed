@@ -28,11 +28,12 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.news_feed_recycler);
         final FeedAdapter adapter = new FeedAdapter();
         recyclerView.setLayoutManager(new GridLayoutManager(this,2));
+        viewModel.getNewsList().observe(this,adapter::submitList);
         recyclerView.setAdapter(adapter);
         viewModel.getNews(1).observe(this, new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
-                adapter.updateList(results);
+                //adapter.updateList(results);
             }
         });
     }
