@@ -1,6 +1,7 @@
 package com.example.newsfeed.data.database;
 
-import android.arch.persistence.room.TypeConverter;
+
+import androidx.room.TypeConverter;
 
 import com.example.newsfeed.network.data.Fields;
 

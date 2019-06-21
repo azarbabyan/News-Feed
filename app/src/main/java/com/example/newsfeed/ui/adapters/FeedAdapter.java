@@ -18,6 +18,11 @@ import java.util.List;
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     private List<Result> data = new ArrayList<>();
 
+    public void updateList(List<Result> results){
+        data = results;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
