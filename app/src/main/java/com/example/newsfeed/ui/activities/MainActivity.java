@@ -1,16 +1,21 @@
 package com.example.newsfeed.ui.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 
 import com.example.newsfeed.R;
 import com.example.newsfeed.listeners.OnloadMoreListener;
 import com.example.newsfeed.ui.adapters.FeedAdapter;
+import com.example.newsfeed.viewmodels.DetailsViewModel;
 import com.example.newsfeed.viewmodels.MainActivityViewModel;
 
 public class MainActivity extends AppCompatActivity implements OnloadMoreListener {
@@ -71,5 +76,12 @@ public class MainActivity extends AppCompatActivity implements OnloadMoreListene
                     break;
             }
         });
+    }
+
+    public void openDetails(String id, View view){
+        Intent intent = new Intent(this, NewsDetailsActivity.class);
+        intent.putExtra("id",id);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, view, getString(R.string.news_thumb_transition));
+        startActivity(intent, options.toBundle());
     }
 }

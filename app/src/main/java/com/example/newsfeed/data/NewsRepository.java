@@ -3,6 +3,7 @@ package com.example.newsfeed.data;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.newsfeed.NewsFeedApplication;
@@ -109,5 +110,9 @@ public class NewsRepository {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public LiveData<Result> getResultById(String id){
+        return newsDao.getResultById(id);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.newsfeed.data.database;
 
+import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -25,5 +26,8 @@ public interface NewsDao {
 
     @Query("SELECT * FROM results")
     DataSource.Factory<Integer, Result> getPagedNews();
+
+    @Query("SELECT * from results WHERE id =:id")
+    LiveData<Result> getResultById(String id);
 
 }

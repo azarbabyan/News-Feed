@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,19 +103,22 @@ public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder
     }
 
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
         ImageView thumb;
         TextView category;
+        Result result;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.news_title);
             thumb = itemView.findViewById(R.id.news_thumb);
             category = itemView.findViewById(R.id.news_category);
+            thumb.setOnClickListener(this);
         }
 
         void bind(Result result) {
+            this.result = result;
             title.setText(result.getWebTitle());
             category.setText(result.getSectionName());
             if (result.getFields() != null && result.getFields().getThumbnail() != null) {
@@ -132,6 +136,13 @@ public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder
             title.setText(null);
             category.setText(null);
             thumb.setImageResource(R.drawable.content_not_available);
+        }
+
+        @Override
+        public void onClick(View v) {
+           if (itemView.getContext() instanceof MainActivity){
+               ((MainActivity) itemView.getContext()).openDetails(result.getId(),v);
+           }
         }
     }
 
