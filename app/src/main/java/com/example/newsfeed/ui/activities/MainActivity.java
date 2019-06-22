@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.os.Bundle;
 
@@ -15,19 +16,20 @@ import com.example.newsfeed.viewmodels.MainActivityViewModel;
 public class MainActivity extends AppCompatActivity implements OnloadMoreListener {
 
     private MainActivityViewModel viewModel;
-    private int totalItemCounts = 100;
+    private int totalItemCounts = 20;
     private int startPage = 1;
+    private FeedAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         RecyclerView recyclerView = findViewById(R.id.news_feed_recycler);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        FeedAdapter adapter = new FeedAdapter(recyclerView, this);
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        adapter = new FeedAdapter(recyclerView, this);
         recyclerView.setAdapter(adapter);
+        viewModel.deleteDb();
         viewModel.getNewsList().observe(this, adapter::submitList);
         getNews(startPage);
     }
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements OnloadMoreListene
                     if (isSuccess) {
                         totalItemCounts = getDBCurrentListSize();
                     }
+                    adapter.setLoaded();
                     break;
                 case ERROR:
                     break;

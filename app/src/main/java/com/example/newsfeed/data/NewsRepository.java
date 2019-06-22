@@ -72,7 +72,7 @@ public class NewsRepository {
         return new NetworkBoundResource<NewsResponse>(true) {
             @Override
             protected void createCall() {
-                NewsFeedApplication.getApiService().getNews(startPage, 100)
+                NewsFeedApplication.getApiService().getNews(startPage, 20)
                         .enqueue(new Callback<NewsResponse>() {
                             @Override
                             public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {

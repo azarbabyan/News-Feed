@@ -1,10 +1,12 @@
 package com.example.newsfeed.ui.adapters;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.TypedArrayUtils;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,33 +15,45 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.newsfeed.R;
 import com.example.newsfeed.listeners.OnloadMoreListener;
 import com.example.newsfeed.network.data.Result;
 import com.example.newsfeed.ui.activities.MainActivity;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 
 public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder> {
 
     private int visibleThreshold = 10;
-
+    private boolean loading;
     public FeedAdapter(RecyclerView recyclerView, OnloadMoreListener onloadMoreListener) {
         super(DIFF_CALLBACK);
-        if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
-            final GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+        if (recyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+            final StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
                     int itemCount = layoutManager.getItemCount();
-                    int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-                    if (itemCount <= (lastVisibleItemPosition + visibleThreshold)) {
+                    int[] into = new int[layoutManager.getSpanCount()];
+                    int[] lastVisibleItemPositions = layoutManager.findLastVisibleItemPositions(into);
+                    int max = lastVisibleItemPositions[0];
+                    for (int lastVisibleItemPosition : lastVisibleItemPositions) {
+                        if (lastVisibleItemPosition > max) {
+                            max = lastVisibleItemPosition;
+                        }
+                    }
+                    if (!loading && itemCount <= (max + visibleThreshold)) {
                         int dbCurrentListSize = getDBCurrentListSize(recyclerView);
                         int totalItemCounts = getTotalItemCounts(recyclerView);
                         if (dbCurrentListSize != -1 && totalItemCounts != -1) {
                             if (dbCurrentListSize > totalItemCounts - 1 && onloadMoreListener != null) {
                                 onloadMoreListener.onLoadMore();
                             }
+                            loading = true;
                         }
                     }
                 }
@@ -65,6 +79,9 @@ public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder
         return -1;
     }
 
+    public void setLoaded() {
+        loading = false;
+    }
 
     @NonNull
     @Override
@@ -103,16 +120,18 @@ public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder
             if (result.getFields() != null && result.getFields().getThumbnail() != null) {
                 Glide.with(thumb.getContext())
                         .load(result.getFields().getThumbnail())
+                        .apply(new RequestOptions()
+                                .placeholder(R.drawable.placeholder ))
                         .into(thumb);
             } else {
-                thumb.setImageResource(R.drawable.ic_launcher_background);
+                thumb.setImageResource(R.drawable.content_not_available);
             }
         }
 
         void clear() {
             title.setText(null);
             category.setText(null);
-            thumb.setImageDrawable(null);
+            thumb.setImageResource(R.drawable.content_not_available);
         }
     }
 
