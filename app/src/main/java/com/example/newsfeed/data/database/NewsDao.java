@@ -1,6 +1,5 @@
 package com.example.newsfeed.data.database;
 
-import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -13,20 +12,18 @@ import com.example.newsfeed.network.data.Result;
 import java.util.List;
 
 
-
-
 @Dao
 public interface NewsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Result result);
+    Long[] insert(List<Result> results);
 
     @Query("DELETE FROM results")
     void deleteAll();
 
     @Query("SELECT * FROM results")
-    LiveData<List<Result>> getAllNews();
+    List<Result> getCurrentList();
 
     @Query("SELECT * FROM results")
-    DataSource.Factory<Integer,Result> getPaggedNews();
+    DataSource.Factory<Integer, Result> getPagedNews();
 
 }

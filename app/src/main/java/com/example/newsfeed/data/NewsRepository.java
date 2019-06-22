@@ -1,17 +1,22 @@
 package com.example.newsfeed.data;
 
 import android.app.Application;
-import android.widget.Toast;
 
-import androidx.lifecycle.LiveData;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.newsfeed.NewsFeedApplication;
 import com.example.newsfeed.data.database.NewsDao;
 import com.example.newsfeed.data.database.NewsDatabase;
 import com.example.newsfeed.network.data.Result;
+import com.example.newsfeed.network.models.NetworkBoundResource;
 import com.example.newsfeed.network.models.NewsResponse;
+import com.example.newsfeed.network.models.Resource;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,16 +27,16 @@ public class NewsRepository {
     private Application application;
     private static NewsRepository instance;
 
-    private NewsRepository(Application application){
+    private NewsRepository(Application application) {
         NewsDatabase database = NewsDatabase.getDatabase(application);
         newsDao = database.newsDao();
         this.application = application;
     }
 
-    public static NewsRepository getInstance(Application application){
-        if (instance == null){
-            synchronized (NewsRepository.class){
-                if (instance == null){
+    public static NewsRepository getInstance(Application application) {
+        if (instance == null) {
+            synchronized (NewsRepository.class) {
+                if (instance == null) {
                     instance = new NewsRepository(application);
                 }
             }
@@ -39,36 +44,70 @@ public class NewsRepository {
         return instance;
     }
 
-    public LiveData<List<Result>> getNews(Integer startPage){
-        NewsFeedApplication.getApiService().getNews(startPage,100).enqueue(new Callback<NewsResponse>() {
-            @Override
-            public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
-                if (response.body() !=null){
-                    new Thread(() -> {
-                        com.example.newsfeed.network.models.Response response1 = response.body().getResponse();
-                        if (response1!=null){
-                            List<Result> results = response1.getResults();
-                            if (results!=null && results.size()>0){
-                                for (Result result:results){
-                                    newsDao.insert(result);
-                                }
-                            }
-                        }
-                    }).start();
+    public void deleteDb() {
+        new Thread(() -> {
+            newsDao.deleteAll();
+        }).start();
+    }
 
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<NewsResponse> call, Throwable t) {
-                Toast.makeText(application, "Network Error", Toast.LENGTH_SHORT).show();
+    public boolean insertResultsToDb(List<Result> results) {
+        List<Long> list = new ArrayList<>();
+        Thread t = new Thread(() -> {
+            if (results != null && results.size() > 0) {
+                Long[] insert = newsDao.insert(results);
+                list.addAll(Arrays.asList(insert));
             }
         });
-        return newsDao.getAllNews();
+        t.start();
+        try {
+            t.join();
+            return list.size() > 0;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public MutableLiveData<Resource<NewsResponse>> getNews(Integer startPage) {
+        return new NetworkBoundResource<NewsResponse>(true) {
+            @Override
+            protected void createCall() {
+                NewsFeedApplication.getApiService().getNews(startPage, 100)
+                        .enqueue(new Callback<NewsResponse>() {
+                            @Override
+                            public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {
+                                if (response.code() == 200 || response.code() == 201) {
+                                    setResultValue(Resource.success(Objects.requireNonNull(response.body())));
+                                } else {
+                                    setResultValue(Resource.error(response.message(), null));
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
+                                setResultValue(Resource.error("Failed to fetch account", null));
+                            }
+                        });
+            }
+        }.getAsMutableLiveData();
     }
 
     public NewsDao getNewsDao() {
         return newsDao;
+    }
+
+    public int currentDBListSize() {
+        List<Integer> count = new ArrayList<>();
+        Thread t = new Thread(() -> {
+            count.add(newsDao.getCurrentList().size());
+        });
+        t.start();
+        try {
+            t.join();
+            return count.get(0);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }

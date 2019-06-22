@@ -3,7 +3,9 @@ package com.example.newsfeed.ui.adapters;
 import androidx.annotation.NonNull;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,28 +14,63 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.newsfeed.R;
+import com.example.newsfeed.listeners.OnloadMoreListener;
 import com.example.newsfeed.network.data.Result;
+import com.example.newsfeed.ui.activities.MainActivity;
 
-import java.util.ArrayList;
-import java.util.List;
 
-public class FeedAdapter extends PagedListAdapter<Result,FeedAdapter.ViewHolder> {
-    private List<Result> data = new ArrayList<>();
+public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder> {
 
-    public FeedAdapter() {
+    private int visibleThreshold = 10;
+
+    public FeedAdapter(RecyclerView recyclerView, OnloadMoreListener onloadMoreListener) {
         super(DIFF_CALLBACK);
+        if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
+            final GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    int itemCount = layoutManager.getItemCount();
+                    int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+                    if (itemCount <= (lastVisibleItemPosition + visibleThreshold)) {
+                        int dbCurrentListSize = getDBCurrentListSize(recyclerView);
+                        int totalItemCounts = getTotalItemCounts(recyclerView);
+                        if (dbCurrentListSize != -1 && totalItemCounts != -1) {
+                            if (dbCurrentListSize > totalItemCounts - 1 && onloadMoreListener != null) {
+                                onloadMoreListener.onLoadMore();
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
-    public void updateList(List<Result> results){
-        data = results;
-        //notifyDataSetChanged();
+    private int getDBCurrentListSize(View view) {
+        if (view.getContext() != null) {
+            if (view.getContext() instanceof MainActivity) {
+                return ((MainActivity) view.getContext()).getDBCurrentListSize();
+            }
+        }
+        return -1;
     }
+
+    private int getTotalItemCounts(View view) {
+        if (view.getContext() != null) {
+            if (view.getContext() instanceof MainActivity) {
+                return ((MainActivity) view.getContext()).getTotalItemCounts();
+            }
+        }
+        return -1;
+    }
+
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View itemView = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.feed_row_layout,viewGroup,false);
+                .inflate(R.layout.feed_row_layout, viewGroup, false);
         return new ViewHolder(itemView);
     }
 
@@ -43,15 +80,12 @@ public class FeedAdapter extends PagedListAdapter<Result,FeedAdapter.ViewHolder>
         if (result != null) {
             viewHolder.bind(result);
         } else {
-            // Null defines a placeholder item - PagedListAdapter automatically
-            // invalidates this row when the actual object is loaded from the
-            // database.
             viewHolder.clear();
         }
     }
 
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         ImageView thumb;
         TextView category;
@@ -63,18 +97,19 @@ public class FeedAdapter extends PagedListAdapter<Result,FeedAdapter.ViewHolder>
             category = itemView.findViewById(R.id.news_category);
         }
 
-        void bind(Result result){
+        void bind(Result result) {
             title.setText(result.getWebTitle());
             category.setText(result.getSectionName());
-            if (result.getFields()!=null && result.getFields().getThumbnail()!=null) {
+            if (result.getFields() != null && result.getFields().getThumbnail() != null) {
                 Glide.with(thumb.getContext())
                         .load(result.getFields().getThumbnail())
                         .into(thumb);
-            }else {
+            } else {
                 thumb.setImageResource(R.drawable.ic_launcher_background);
             }
         }
-        void clear(){
+
+        void clear() {
             title.setText(null);
             category.setText(null);
             thumb.setImageDrawable(null);
