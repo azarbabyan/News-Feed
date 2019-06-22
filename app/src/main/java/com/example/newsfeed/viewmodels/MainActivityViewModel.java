@@ -10,6 +10,7 @@ import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
 import com.example.newsfeed.data.NewsRepository;
+import com.example.newsfeed.data.database.PinedNews;
 import com.example.newsfeed.network.data.Result;
 import com.example.newsfeed.network.models.NewsResponse;
 import com.example.newsfeed.network.models.Resource;
@@ -19,12 +20,15 @@ import java.util.List;
 public class MainActivityViewModel extends AndroidViewModel {
     private NewsRepository repository;
     private final LiveData<PagedList<Result>> newsList;
+    private final LiveData<PagedList<PinedNews>> pagedListLiveData;
 
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         repository = NewsRepository.getInstance(application);
-        newsList = new LivePagedListBuilder<>(repository.getNewsDao().getPagedNews(), 10)
+        newsList = new LivePagedListBuilder<>(repository.getNewsDao().getPagedNews(), 20)
+                .build();
+        pagedListLiveData = new LivePagedListBuilder<>(repository.getNewsDao().getPinnedPagedNews(),10)
                 .build();
     }
 
@@ -35,6 +39,10 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public LiveData<PagedList<Result>> getNewsList() {
         return newsList;
+    }
+
+    public LiveData<PagedList<PinedNews>> getPinnedNews() {
+        return pagedListLiveData;
     }
 
     public int currentDBListSize() {
@@ -48,4 +56,5 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void deleteDb() {
         repository.deleteDb();
     }
+
 }

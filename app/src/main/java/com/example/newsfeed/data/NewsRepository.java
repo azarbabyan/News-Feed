@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.newsfeed.NewsFeedApplication;
 import com.example.newsfeed.data.database.NewsDao;
 import com.example.newsfeed.data.database.NewsDatabase;
+import com.example.newsfeed.data.database.PinedNews;
 import com.example.newsfeed.network.data.Result;
 import com.example.newsfeed.network.models.NetworkBoundResource;
 import com.example.newsfeed.network.models.NewsResponse;
@@ -114,5 +115,11 @@ public class NewsRepository {
 
     public LiveData<Result> getResultById(String id){
         return newsDao.getResultById(id);
+    }
+
+    public void inserPinnedNews(PinedNews pinedNews){
+        new Thread(() -> {
+            newsDao.insertPinnedNews(pinedNews);
+        }).start();
     }
 }

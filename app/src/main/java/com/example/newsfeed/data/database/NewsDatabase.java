@@ -10,7 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.newsfeed.network.data.Result;
 
-@Database(entities = {Result.class}, version = 1, exportSchema = false)
+@Database(entities = {Result.class,PinedNews.class}, version = 1, exportSchema = false)
 public abstract class NewsDatabase extends RoomDatabase {
     public abstract NewsDao newsDao();
 

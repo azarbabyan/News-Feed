@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.newsfeed.data.NewsRepository;
+import com.example.newsfeed.data.database.PinedNews;
 import com.example.newsfeed.network.data.Result;
 
 public class DetailsViewModel extends AndroidViewModel {
@@ -20,5 +21,9 @@ public class DetailsViewModel extends AndroidViewModel {
 
     public LiveData<Result> getResultById(String id) {
         return repository.getResultById(id);
+    }
+
+    public void insertPinnedNews(PinedNews pinedNews){
+        repository.inserPinnedNews(pinedNews);
     }
 }

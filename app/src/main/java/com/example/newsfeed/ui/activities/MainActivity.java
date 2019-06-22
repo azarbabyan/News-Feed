@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -15,6 +16,7 @@ import android.view.View;
 import com.example.newsfeed.R;
 import com.example.newsfeed.listeners.OnloadMoreListener;
 import com.example.newsfeed.ui.adapters.FeedAdapter;
+import com.example.newsfeed.ui.adapters.PinnedNewsAdapter;
 import com.example.newsfeed.viewmodels.DetailsViewModel;
 import com.example.newsfeed.viewmodels.MainActivityViewModel;
 
@@ -24,19 +26,28 @@ public class MainActivity extends AppCompatActivity implements OnloadMoreListene
     private int totalItemCounts = 20;
     private int startPage = 1;
     private FeedAdapter adapter;
+    private RecyclerView recyclerView,pinnedRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bindViews();
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
-        RecyclerView recyclerView = findViewById(R.id.news_feed_recycler);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         adapter = new FeedAdapter(recyclerView, this);
         recyclerView.setAdapter(adapter);
-        viewModel.deleteDb();
         viewModel.getNewsList().observe(this, adapter::submitList);
+        PinnedNewsAdapter pinnedNewsAdapter = new PinnedNewsAdapter();
+        pinnedRecyclerView.setLayoutManager(new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false));
+        pinnedRecyclerView.setAdapter(pinnedNewsAdapter);
+        viewModel.getPinnedNews().observe(this,pinnedNewsAdapter::submitList);
         getNews(startPage);
+    }
+
+    private void bindViews(){
+        recyclerView = findViewById(R.id.news_feed_recycler);
+        pinnedRecyclerView = findViewById(R.id.pined_recyclerview);
     }
 
     public int getDBCurrentListSize() {

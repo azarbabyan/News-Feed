@@ -30,4 +30,13 @@ public interface NewsDao {
     @Query("SELECT * from results WHERE id =:id")
     LiveData<Result> getResultById(String id);
 
+    @Query("SELECT * FROM pinnednews")
+    LiveData<PinedNews> getAllPinnedNews();
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertPinnedNews(PinedNews pinedNews);
+
+    @Query("SELECT * FROM pinnednews")
+    DataSource.Factory<Integer, PinedNews> getPinnedPagedNews();
+
 }
