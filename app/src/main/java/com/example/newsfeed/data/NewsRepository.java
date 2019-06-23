@@ -46,9 +46,9 @@ public class NewsRepository {
         return instance;
     }
 
-    public void deleteDb() {
+    public void deleteAllResults() {
         new Thread(() -> {
-            newsDao.deleteAll();
+            newsDao.deleteAllResults();
         }).start();
     }
 
@@ -113,13 +113,47 @@ public class NewsRepository {
         return -1;
     }
 
-    public LiveData<Result> getResultById(String id){
+    public LiveData<Result> getResultById(String id) {
         return newsDao.getResultById(id);
     }
 
-    public void inserPinnedNews(PinedNews pinedNews){
+    public boolean insertPinedNews(PinedNews pinedNews) {
+        List<Long> list = new ArrayList<>();
+        Thread t = new Thread(() -> {
+            Long insert = newsDao.insertPinedNews(pinedNews);
+            list.add(insert);
+        });
+        t.start();
+        try {
+            t.join();
+            return list.size()>0;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isPined(String id) {
+        List<Boolean> list = new ArrayList<>();
+        Thread t = new Thread(() -> {
+            PinedNews pinedNewsById = newsDao.getPinedNewsById(id);
+            if (pinedNewsById != null) {
+                list.add(true);
+            }
+        });
+        t.start();
+        try {
+            t.join();
+            return list.size() > 0;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void deletePinedNews(PinedNews pinedNews){
         new Thread(() -> {
-            newsDao.insertPinnedNews(pinedNews);
+            newsDao.deletePinedNews(pinedNews);
         }).start();
     }
 }

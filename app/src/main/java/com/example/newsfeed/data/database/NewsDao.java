@@ -3,6 +3,7 @@ package com.example.newsfeed.data.database;
 import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -19,7 +20,7 @@ public interface NewsDao {
     Long[] insert(List<Result> results);
 
     @Query("DELETE FROM results")
-    void deleteAll();
+    void deleteAllResults();
 
     @Query("SELECT * FROM results")
     List<Result> getCurrentList();
@@ -34,9 +35,15 @@ public interface NewsDao {
     LiveData<PinedNews> getAllPinnedNews();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertPinnedNews(PinedNews pinedNews);
+    Long insertPinedNews(PinedNews pinedNews);
 
     @Query("SELECT * FROM pinnednews")
     DataSource.Factory<Integer, PinedNews> getPinnedPagedNews();
+
+    @Query("SELECT * FROM pinnednews WHERE id =:id")
+    PinedNews getPinedNewsById(String id);
+
+    @Delete
+    void deletePinedNews(PinedNews pinedNews);
 
 }

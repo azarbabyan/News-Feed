@@ -21,6 +21,8 @@ public class MainActivityViewModel extends AndroidViewModel {
     private NewsRepository repository;
     private final LiveData<PagedList<Result>> newsList;
     private final LiveData<PagedList<PinedNews>> pagedListLiveData;
+    private int totalItemCounts = 20;
+    private int startPage = 1;
 
 
     public MainActivityViewModel(@NonNull Application application) {
@@ -53,8 +55,27 @@ public class MainActivityViewModel extends AndroidViewModel {
         return repository.insertResultsToDb(results);
     }
 
-    public void deleteDb() {
-        repository.deleteDb();
+    public void deleteAllResults() {
+        repository.deleteAllResults();
     }
 
+    public int getTotalItemCounts() {
+        return totalItemCounts;
+    }
+
+    public void setTotalItemCounts(int totalItemCounts) {
+        this.totalItemCounts = totalItemCounts;
+    }
+
+    public int getStartPage() {
+        return startPage;
+    }
+
+    public void setStartPage(int startPage) {
+        this.startPage = startPage;
+    }
+
+    public void incrementStartpage(){
+        this.startPage++;
+    }
 }

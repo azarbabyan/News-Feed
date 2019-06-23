@@ -12,6 +12,8 @@ import com.example.newsfeed.network.data.Result;
 
 public class DetailsViewModel extends AndroidViewModel {
     private NewsRepository repository;
+    private String resultId;
+    private boolean isPined;
 
 
     public DetailsViewModel(@NonNull Application application) {
@@ -23,7 +25,31 @@ public class DetailsViewModel extends AndroidViewModel {
         return repository.getResultById(id);
     }
 
-    public void insertPinnedNews(PinedNews pinedNews){
-        repository.inserPinnedNews(pinedNews);
+    public boolean insertPinnedNews(PinedNews pinedNews){
+       return repository.insertPinedNews(pinedNews);
+    }
+
+    public boolean isPined(String id){
+        return repository.isPined(id);
+    }
+
+    public void  deletePinnedNews(PinedNews pinedNews){
+        repository.deletePinedNews(pinedNews);
+    }
+
+    public String getResultId() {
+        return resultId;
+    }
+
+    public boolean isPined() {
+        return isPined;
+    }
+
+    public void setResultId(String resultId) {
+        this.resultId = resultId;
+    }
+
+    public void setPined(boolean pined) {
+        isPined = pined;
     }
 }

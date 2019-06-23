@@ -2,7 +2,8 @@
     <string name="app_name">News Feed</string>
     <string name="title_text_hint">title_text</string>
     <string name="category_text_hint">category text</string>
-    <string name="news_thumb_transition">news thumb transaction</string>
     <string name="save">Save</string>
+    <string name="delete">Delete</string>
     <string name="visit_page">Visit Page</string>
+    <string name="news_thumb_transition">News thumb transition </string>
 </resources>

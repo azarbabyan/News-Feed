@@ -28,8 +28,8 @@ import java.util.Collections;
 
 public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder> {
 
-    private int visibleThreshold = 10;
     private boolean loading;
+
     public FeedAdapter(RecyclerView recyclerView, OnloadMoreListener onloadMoreListener) {
         super(DIFF_CALLBACK);
         if (recyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
@@ -38,27 +38,32 @@ public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
-                    int itemCount = layoutManager.getItemCount();
-                    int[] into = new int[layoutManager.getSpanCount()];
-                    int[] lastVisibleItemPositions = layoutManager.findLastVisibleItemPositions(into);
-                    int max = lastVisibleItemPositions[0];
-                    for (int lastVisibleItemPosition : lastVisibleItemPositions) {
-                        if (lastVisibleItemPosition > max) {
-                            max = lastVisibleItemPosition;
-                        }
-                    }
-                    if (!loading && itemCount <= (max + visibleThreshold)) {
-                        int dbCurrentListSize = getDBCurrentListSize(recyclerView);
-                        int totalItemCounts = getTotalItemCounts(recyclerView);
-                        if (dbCurrentListSize != -1 && totalItemCounts != -1) {
-                            if (dbCurrentListSize > totalItemCounts - 1 && onloadMoreListener != null) {
-                                onloadMoreListener.onLoadMore();
-                            }
-                            loading = true;
-                        }
-                    }
+                    checkIfOnLoadMoreNeeded(layoutManager, onloadMoreListener, recyclerView);
                 }
             });
+        }
+    }
+
+    private void checkIfOnLoadMoreNeeded(StaggeredGridLayoutManager layoutManager, OnloadMoreListener onloadMoreListener, RecyclerView recyclerView) {
+        int itemCount = layoutManager.getItemCount();
+        int[] into = new int[layoutManager.getSpanCount()];
+        int[] lastVisibleItemPositions = layoutManager.findLastVisibleItemPositions(into);
+        int max = lastVisibleItemPositions[0];
+        for (int lastVisibleItemPosition : lastVisibleItemPositions) {
+            if (lastVisibleItemPosition > max) {
+                max = lastVisibleItemPosition;
+            }
+        }
+        int visibleThreshold = 10;
+        if (!loading && itemCount <= (max + visibleThreshold)) {
+            int dbCurrentListSize = getDBCurrentListSize(recyclerView);
+            int totalItemCounts = getTotalItemCounts(recyclerView);
+            if (dbCurrentListSize != -1 && totalItemCounts != -1) {
+                if (dbCurrentListSize > totalItemCounts - 1 && onloadMoreListener != null) {
+                    onloadMoreListener.onLoadMore();
+                }
+                loading = true;
+            }
         }
     }
 
@@ -125,7 +130,7 @@ public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder
                 Glide.with(thumb.getContext())
                         .load(result.getFields().getThumbnail())
                         .apply(new RequestOptions()
-                                .placeholder(R.drawable.placeholder ))
+                                .placeholder(R.drawable.placeholder))
                         .into(thumb);
             } else {
                 thumb.setImageResource(R.drawable.content_not_available);
@@ -140,9 +145,9 @@ public class FeedAdapter extends PagedListAdapter<Result, FeedAdapter.ViewHolder
 
         @Override
         public void onClick(View v) {
-           if (itemView.getContext() instanceof MainActivity){
-               ((MainActivity) itemView.getContext()).openDetails(result.getId(),v);
-           }
+            if (itemView.getContext() instanceof MainActivity) {
+                ((MainActivity) itemView.getContext()).openDetails(result.getId(), v);
+            }
         }
     }
 

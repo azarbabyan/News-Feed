@@ -3,13 +3,11 @@ package com.example.newsfeed.ui.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -17,16 +15,16 @@ import com.example.newsfeed.R;
 import com.example.newsfeed.listeners.OnloadMoreListener;
 import com.example.newsfeed.ui.adapters.FeedAdapter;
 import com.example.newsfeed.ui.adapters.PinnedNewsAdapter;
-import com.example.newsfeed.viewmodels.DetailsViewModel;
 import com.example.newsfeed.viewmodels.MainActivityViewModel;
+
+import static com.example.newsfeed.utils.AppConstants.USER_ID;
 
 public class MainActivity extends AppCompatActivity implements OnloadMoreListener {
 
     private MainActivityViewModel viewModel;
-    private int totalItemCounts = 20;
-    private int startPage = 1;
+
     private FeedAdapter adapter;
-    private RecyclerView recyclerView,pinnedRecyclerView;
+    private RecyclerView recyclerView, pinnedRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +37,14 @@ public class MainActivity extends AppCompatActivity implements OnloadMoreListene
         recyclerView.setAdapter(adapter);
         viewModel.getNewsList().observe(this, adapter::submitList);
         PinnedNewsAdapter pinnedNewsAdapter = new PinnedNewsAdapter();
-        pinnedRecyclerView.setLayoutManager(new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false));
+        pinnedRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
         pinnedRecyclerView.setAdapter(pinnedNewsAdapter);
-        viewModel.getPinnedNews().observe(this,pinnedNewsAdapter::submitList);
-        getNews(startPage);
+        viewModel.getPinnedNews().observe(this, pinnedNewsAdapter::submitList);
+        viewModel.setStartPage(1);
+        getNews(viewModel.getStartPage());
     }
 
-    private void bindViews(){
+    private void bindViews() {
         recyclerView = findViewById(R.id.news_feed_recycler);
         pinnedRecyclerView = findViewById(R.id.pined_recyclerview);
     }
@@ -55,13 +54,13 @@ public class MainActivity extends AppCompatActivity implements OnloadMoreListene
     }
 
     public int getTotalItemCounts() {
-        return totalItemCounts;
+        return viewModel.getTotalItemCounts();
     }
 
     @Override
     public void onLoadMore() {
-        startPage++;
-        getNews(startPage);
+        viewModel.incrementStartpage();
+        getNews(viewModel.getStartPage());
     }
 
     private void getNews(Integer startPage) {
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements OnloadMoreListene
                         }
                     }
                     if (isSuccess) {
-                        totalItemCounts = getDBCurrentListSize();
+                        viewModel.setTotalItemCounts(getDBCurrentListSize());
                     }
                     adapter.setLoaded();
                     break;
@@ -89,9 +88,9 @@ public class MainActivity extends AppCompatActivity implements OnloadMoreListene
         });
     }
 
-    public void openDetails(String id, View view){
+    public void openDetails(String id, View view) {
         Intent intent = new Intent(this, NewsDetailsActivity.class);
-        intent.putExtra("id",id);
+        intent.putExtra(USER_ID, id);
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, view, getString(R.string.news_thumb_transition));
         startActivity(intent, options.toBundle());
     }
