@@ -31,23 +31,24 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.example.newsfeed.NewsFeedApplication.CHANNEL_ID;
+import static com.example.newsfeed.NewsFeedApplication.LOW_CHANNEL_ID;
 
 public class NewsCheckService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        NewsFeedApplication.getApiService().getNews(1,20).enqueue(new Callback<NewsResponse>() {
+        NewsFeedApplication.getApiService().getNews(1, 20).enqueue(new Callback<NewsResponse>() {
             @Override
-            public void onResponse(@NonNull Call<NewsResponse> call,@NonNull Response<NewsResponse> response) {
-                if (response.body()!=null){
-                    if (response.body().getResponse()!=null){
+            public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {
+                if (response.body() != null) {
+                    if (response.body().getResponse() != null) {
                         List<Result> results = response.body().getResponse().getResults();
-                        if (results !=null){
+                        if (results != null) {
                             Result resultById = NewsRepository.getInstance(NewsCheckService.this).getResultByIdForService(results.get(0).getId());
-                            if (resultById==null){
+                            if (resultById == null) {
                                 if (MyLifecycleHandler.isApplicationVisible()) {
                                     NewsRepository.getInstance(NewsCheckService.this).insertResultsToDb(results);
                                     EventBus.getDefault().post(new UpdateDbEvent());
-                                }else {
+                                } else {
                                     sendNotification();
                                 }
                             }
@@ -58,7 +59,7 @@ public class NewsCheckService extends Service {
             }
 
             @Override
-            public void onFailure(@NonNull Call<NewsResponse> call,@NonNull Throwable t) {
+            public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
                 stopSelf();
             }
         });
@@ -68,7 +69,7 @@ public class NewsCheckService extends Service {
     private void sendNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 , intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -82,7 +83,7 @@ public class NewsCheckService extends Service {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 
-        notificationManager.notify(100 , notificationBuilder.build());
+        notificationManager.notify(100, notificationBuilder.build());
     }
 
     @Override
@@ -97,15 +98,12 @@ public class NewsCheckService extends Service {
     }
 
     private Notification createNotification() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(this, CHANNEL_ID)
+                new NotificationCompat.Builder(this, LOW_CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
                         .setContentTitle("")
                         .setContentText("")
-                        .setContentIntent(pendingIntent);
+                        .setPriority(NotificationManager.IMPORTANCE_LOW);
         return notificationBuilder.build();
     }
 

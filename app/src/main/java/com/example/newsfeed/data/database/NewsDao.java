@@ -25,7 +25,7 @@ public interface NewsDao {
     @Query("SELECT * FROM results")
     List<Result> getCurrentList();
 
-    @Query("SELECT * FROM results")
+    @Query("SELECT * FROM results ORDER BY webPublicationDate DESC")
     DataSource.Factory<Integer, Result> getPagedNews();
 
     @Query("SELECT * from results WHERE id =:id")

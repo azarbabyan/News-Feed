@@ -27,7 +27,9 @@ import static com.example.newsfeed.utils.AppConstants.BASE_URL;
 public class NewsFeedApplication extends Application {
 
     public static final String CHANNEL_ID = "channel";
+    public static final String LOW_CHANNEL_ID = "low_channel";
     private static final String NAME ="name";
+    private static final String LOW_CHANNEL_NAME ="low_channel_name";
     private static final String DESCRIPTION ="description";
 
     private static NewsApiService apiService;
@@ -59,11 +61,14 @@ public class NewsFeedApplication extends Application {
     public void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int low = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, NAME, importance);
+            NotificationChannel lowChannel = new NotificationChannel(LOW_CHANNEL_ID, LOW_CHANNEL_NAME, low);
             channel.setDescription(DESCRIPTION);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
+                notificationManager.createNotificationChannel(lowChannel);
             }
         }
     }
