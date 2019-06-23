@@ -66,7 +66,9 @@ public class PinnedNewsAdapter extends PagedListAdapter<PinedNews, PinnedNewsAda
                 Glide.with(thumb.getContext())
                         .load(result.getFields().getThumbnail())
                         .apply(new RequestOptions()
-                                .placeholder(R.drawable.placeholder))
+                                .placeholder(R.drawable.placeholder)
+                                .error(R.drawable.content_not_available))
+
                         .into(thumb);
             } else {
                 thumb.setImageResource(R.drawable.content_not_available);

@@ -48,8 +48,7 @@ public class NewsDetailsActivity extends AppCompatActivity {
                 if (result.getFields() != null && result.getFields().getThumbnail() != null) {
                     Glide.with(this)
                             .load(result.getFields().getThumbnail())
-                            .apply(new RequestOptions()
-                                    .placeholder(R.drawable.placeholder))
+                            .apply(new RequestOptions().error(R.drawable.content_not_available))
                             .into(thumb);
                 } else {
                     thumb.setImageResource(R.drawable.content_not_available);

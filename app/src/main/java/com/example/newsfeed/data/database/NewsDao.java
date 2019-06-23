@@ -29,7 +29,10 @@ public interface NewsDao {
     DataSource.Factory<Integer, Result> getPagedNews();
 
     @Query("SELECT * from results WHERE id =:id")
-    LiveData<Result> getResultById(String id);
+    LiveData<Result> getLiveDataResultById(String id);
+
+    @Query("SELECT * from results WHERE id =:id")
+    Result getResultById(String id);
 
     @Query("SELECT * FROM pinnednews")
     LiveData<PinedNews> getAllPinnedNews();

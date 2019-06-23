@@ -1,6 +1,6 @@
 package com.example.newsfeed.data;
 
-import android.app.Application;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -26,16 +26,16 @@ import retrofit2.Response;
 
 public class NewsRepository {
     private NewsDao newsDao;
-    private Application application;
+    private Context context;
     private static NewsRepository instance;
 
-    private NewsRepository(Application application) {
-        NewsDatabase database = NewsDatabase.getDatabase(application);
+    private NewsRepository(Context context) {
+        NewsDatabase database = NewsDatabase.getDatabase(context);
         newsDao = database.newsDao();
-        this.application = application;
+        this.context = context;
     }
 
-    public static NewsRepository getInstance(Application application) {
+    public static NewsRepository getInstance(Context application) {
         if (instance == null) {
             synchronized (NewsRepository.class) {
                 if (instance == null) {
@@ -114,7 +114,7 @@ public class NewsRepository {
     }
 
     public LiveData<Result> getResultById(String id) {
-        return newsDao.getResultById(id);
+        return newsDao.getLiveDataResultById(id);
     }
 
     public boolean insertPinedNews(PinedNews pinedNews) {
@@ -155,5 +155,23 @@ public class NewsRepository {
         new Thread(() -> {
             newsDao.deletePinedNews(pinedNews);
         }).start();
+    }
+
+    public Result getResultByIdForService(String id){
+        List<Result> results = new ArrayList<>();
+        Thread t = new Thread(() -> {
+            Result resultById = newsDao.getResultById(id);
+            if (resultById!=null){
+                results.add(resultById);
+            }
+        });
+        t.start();
+        try {
+            t.join();
+            return results.size()>0?results.get(0):null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
