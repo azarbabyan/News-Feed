@@ -74,7 +74,7 @@ public class NewsRepository {
         return new NetworkBoundResource<NewsResponse>(true) {
             @Override
             protected void createCall() {
-                NewsFeedApplication.getApiService().getNews(startPage, 20)
+                NewsFeedApplication.getApiService().getNews(startPage)
                         .enqueue(new Callback<NewsResponse>() {
                             @Override
                             public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {
@@ -126,7 +126,7 @@ public class NewsRepository {
         t.start();
         try {
             t.join();
-            return list.size()>0;
+            return list.size() > 0;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -151,24 +151,24 @@ public class NewsRepository {
         return false;
     }
 
-    public void deletePinedNews(PinedNews pinedNews){
+    public void deletePinedNews(PinedNews pinedNews) {
         new Thread(() -> {
             newsDao.deletePinedNews(pinedNews);
         }).start();
     }
 
-    public Result getResultByIdForService(String id){
+    public Result getResultByIdForService(String id) {
         List<Result> results = new ArrayList<>();
         Thread t = new Thread(() -> {
             Result resultById = newsDao.getResultById(id);
-            if (resultById!=null){
+            if (resultById != null) {
                 results.add(resultById);
             }
         });
         t.start();
         try {
             t.join();
-            return results.size()>0?results.get(0):null;
+            return results.size() > 0 ? results.get(0) : null;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

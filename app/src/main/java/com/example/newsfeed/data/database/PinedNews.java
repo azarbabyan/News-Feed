@@ -12,6 +12,7 @@ import com.example.newsfeed.network.data.Result;
 
 
 import java.util.Objects;
+
 @Entity(tableName = "pinnednews")
 public class PinedNews {
 
@@ -48,7 +49,7 @@ public class PinedNews {
 
     public PinedNews(Result result) {
         id = result.getId();
-        type  = result.getType();
+        type = result.getType();
         sectionId = result.getSectionId();
         sectionName = result.getSectionName();
         webPublicationDate = result.getWebPublicationDate();
@@ -168,10 +169,10 @@ public class PinedNews {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj==null){
+        if (obj == null) {
             return false;
         }
-        if (!(obj instanceof PinedNews)){
+        if (!(obj instanceof PinedNews)) {
             return false;
         }
         final PinedNews result = (PinedNews) obj;

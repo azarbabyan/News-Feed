@@ -34,10 +34,10 @@ public class Fields {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj==null){
+        if (obj == null) {
             return false;
         }
-        if (!(obj instanceof Fields)){
+        if (!(obj instanceof Fields)) {
             return false;
         }
         final Fields fields = (Fields) obj;

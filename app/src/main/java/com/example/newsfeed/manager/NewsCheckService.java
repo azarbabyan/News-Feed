@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -36,7 +35,7 @@ import static com.example.newsfeed.NewsFeedApplication.LOW_CHANNEL_ID;
 public class NewsCheckService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        NewsFeedApplication.getApiService().getNews(1, 20).enqueue(new Callback<NewsResponse>() {
+        NewsFeedApplication.getApiService().getNews(1).enqueue(new Callback<NewsResponse>() {
             @Override
             public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {
                 if (response.body() != null) {
@@ -75,7 +74,7 @@ public class NewsCheckService extends Service {
                 new NotificationCompat.Builder(this, CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
                         .setContentTitle("News")
-                        .setContentText("You have a unread news")
+                        .setContentText("You have a new news")
                         .setAutoCancel(true)
                         .setContentIntent(pendingIntent);
 

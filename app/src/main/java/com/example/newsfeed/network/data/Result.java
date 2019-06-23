@@ -176,10 +176,10 @@ public class Result {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj==null){
+        if (obj == null) {
             return false;
         }
-        if (!(obj instanceof Result)){
+        if (!(obj instanceof Result)) {
             return false;
         }
         final Result result = (Result) obj;
