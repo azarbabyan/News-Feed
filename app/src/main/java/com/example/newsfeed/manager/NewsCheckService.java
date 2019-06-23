@@ -17,9 +17,12 @@ import androidx.core.app.NotificationCompat;
 import com.example.newsfeed.NewsFeedApplication;
 import com.example.newsfeed.R;
 import com.example.newsfeed.data.NewsRepository;
+import com.example.newsfeed.data.eventbusmodels.UpdateDbEvent;
 import com.example.newsfeed.network.data.Result;
 import com.example.newsfeed.network.models.NewsResponse;
 import com.example.newsfeed.ui.activities.MainActivity;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -43,6 +46,7 @@ public class NewsCheckService extends Service {
                             if (resultById==null){
                                 if (MyLifecycleHandler.isApplicationVisible()) {
                                     NewsRepository.getInstance(NewsCheckService.this).insertResultsToDb(results);
+                                    EventBus.getDefault().post(new UpdateDbEvent());
                                 }else {
                                     sendNotification();
                                 }
