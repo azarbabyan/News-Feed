@@ -1,5 +1,6 @@
 package com.example.newsfeed.manager;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -24,6 +25,7 @@ import com.example.newsfeed.ui.activities.MainActivity;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,7 +50,7 @@ public class NewsCheckService extends Service {
                                     NewsRepository.getInstance(NewsCheckService.this).insertResultsToDb(results);
                                     EventBus.getDefault().post(new UpdateDbEvent());
                                 } else {
-                                    sendNotification();
+                                    sendNotification(results.get(0).getWebTitle());
                                 }
                             }
                         }
@@ -65,7 +67,7 @@ public class NewsCheckService extends Service {
         return START_NOT_STICKY;
     }
 
-    private void sendNotification() {
+    private void sendNotification(String title) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
@@ -73,8 +75,8 @@ public class NewsCheckService extends Service {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentTitle("News")
-                        .setContentText("You have a new news")
+                        .setContentTitle(title)
+                        .setContentText("Tap to open app")
                         .setAutoCancel(true)
                         .setContentIntent(pendingIntent);
 
@@ -82,7 +84,7 @@ public class NewsCheckService extends Service {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 
-        notificationManager.notify(100, notificationBuilder.build());
+        Objects.requireNonNull(notificationManager).notify(100, notificationBuilder.build());
     }
 
     @Override
@@ -96,11 +98,12 @@ public class NewsCheckService extends Service {
         startForeground(1, createNotification());
     }
 
+    @TargetApi(Build.VERSION_CODES.N)
     private Notification createNotification() {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, LOW_CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentTitle("")
+                        .setContentTitle("Service is Running")
                         .setContentText("")
                         .setPriority(NotificationManager.IMPORTANCE_LOW);
         return notificationBuilder.build();
