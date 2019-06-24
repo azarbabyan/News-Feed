@@ -114,7 +114,12 @@ public class MainActivity extends AppCompatActivity implements OnloadMoreListene
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateDbEvent event) {
-        viewModel.setStartPage(1);
-        viewModel.setTotalItemCounts(viewModel.currentDBListSize());
+        if (viewModel!=null) {
+            viewModel.setStartPage(1);
+            viewModel.setTotalItemCounts(viewModel.currentDBListSize());
+            if (recyclerView!=null){
+                recyclerView.scrollToPosition(0);
+            }
+        }
     }
 }

@@ -46,11 +46,11 @@ public class NewsCheckService extends Service {
                         if (results != null) {
                             Result resultById = NewsRepository.getInstance(NewsCheckService.this).getResultByIdForService(results.get(0).getId());
                             if (resultById == null) {
-                                if (MyLifecycleHandler.isApplicationVisible()) {
-                                    NewsRepository.getInstance(NewsCheckService.this).insertResultsToDb(results);
+                                NewsRepository.getInstance(NewsCheckService.this).insertResultsToDb(results);
+                                if (MyLifecycleHandler.isApplicationInForeground()) {
+                                    sendNotification();
+                                }else {
                                     EventBus.getDefault().post(new UpdateDbEvent());
-                                } else {
-                                    sendNotification(results.get(0).getWebTitle());
                                 }
                             }
                         }
@@ -67,7 +67,7 @@ public class NewsCheckService extends Service {
         return START_NOT_STICKY;
     }
 
-    private void sendNotification(String title) {
+    private void sendNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
@@ -75,7 +75,7 @@ public class NewsCheckService extends Service {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentTitle(title)
+                        .setContentTitle("You have a fresh news")
                         .setContentText("Tap to open app")
                         .setAutoCancel(true)
                         .setContentIntent(pendingIntent);
@@ -103,7 +103,7 @@ public class NewsCheckService extends Service {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, LOW_CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentTitle("Service is Running")
+                        .setContentTitle("Checking for fresh news")
                         .setContentText("")
                         .setPriority(NotificationManager.IMPORTANCE_LOW);
         return notificationBuilder.build();
