@@ -47,10 +47,10 @@ public class NewsCheckService extends Service {
                             Result resultById = NewsRepository.getInstance(NewsCheckService.this).getResultByIdForService(results.get(0).getId());
                             if (resultById == null) {
                                 NewsRepository.getInstance(NewsCheckService.this).insertResultsToDb(results);
-                                if (MyLifecycleHandler.isApplicationInForeground()) {
-                                    sendNotification();
-                                }else {
+                                if (MyLifecycleHandler.isApplicationVisible()){
                                     EventBus.getDefault().post(new UpdateDbEvent());
+                                }else {
+                                    sendNotification();
                                 }
                             }
                         }
